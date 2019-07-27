@@ -16,19 +16,20 @@
   
   
   
-  <title>QianKeTutu</title>
+  <title>pwn level0，1，2 | QianKeTutu</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="#pwn level0 、 level1 、 level2总结 ##pwn题初识    初识pwn：“Pwn”是一个黑客语法的俚语词，是指攻破设备或者系统。发音类似“砰”，对黑客而言，这就是成功实施黑客攻击的声音——砰的一声，被“黑”的电脑或手机就被你操纵了。   pwn题要干嘛：构造或者伪造后门函数，得到shell。   看懂pwn题exp参考：pwntools使用简介https://blog.">
+  <meta name="description" content="#pwn level0 、 level1 、 level2总结 ##pwn题初识    初识pwn：“Pwn”是一个黑客语法的俚语词，是指攻破设备或者系统。发音类似“砰”，对黑客而言，这就是成功实施黑客攻击的声音——砰的一声，被“黑”的电脑或手机就被你操纵了。   pwn题要干嘛：构造或者伪造后门函数，得到shell。   看懂pwn题exp参考：pwntools使用简介https://blog">
+<meta name="keywords" content="pwn">
 <meta property="og:type" content="article">
-<meta property="og:title" content="QianKeTutu">
-<meta property="og:url" content="http://yoursite.com/2019/07/27/pwn012/index.html">
+<meta property="og:title" content="pwn level0，1，2">
+<meta property="og:url" content="http://yoursite.com/2019/07/25/pwn012/index.html">
 <meta property="og:site_name" content="QianKeTutu">
-<meta property="og:description" content="#pwn level0 、 level1 、 level2总结 ##pwn题初识    初识pwn：“Pwn”是一个黑客语法的俚语词，是指攻破设备或者系统。发音类似“砰”，对黑客而言，这就是成功实施黑客攻击的声音——砰的一声，被“黑”的电脑或手机就被你操纵了。   pwn题要干嘛：构造或者伪造后门函数，得到shell。   看懂pwn题exp参考：pwntools使用简介https://blog.">
+<meta property="og:description" content="#pwn level0 、 level1 、 level2总结 ##pwn题初识    初识pwn：“Pwn”是一个黑客语法的俚语词，是指攻破设备或者系统。发音类似“砰”，对黑客而言，这就是成功实施黑客攻击的声音——砰的一声，被“黑”的电脑或手机就被你操纵了。   pwn题要干嘛：构造或者伪造后门函数，得到shell。   看懂pwn题exp参考：pwntools使用简介https://blog">
 <meta property="og:locale" content="default">
-<meta property="og:updated_time" content="2019-07-25T02:54:22.703Z">
+<meta property="og:updated_time" content="2019-07-27T08:36:00.221Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="QianKeTutu">
-<meta name="twitter:description" content="#pwn level0 、 level1 、 level2总结 ##pwn题初识    初识pwn：“Pwn”是一个黑客语法的俚语词，是指攻破设备或者系统。发音类似“砰”，对黑客而言，这就是成功实施黑客攻击的声音——砰的一声，被“黑”的电脑或手机就被你操纵了。   pwn题要干嘛：构造或者伪造后门函数，得到shell。   看懂pwn题exp参考：pwntools使用简介https://blog.">
+<meta name="twitter:title" content="pwn level0，1，2">
+<meta name="twitter:description" content="#pwn level0 、 level1 、 level2总结 ##pwn题初识    初识pwn：“Pwn”是一个黑客语法的俚语词，是指攻破设备或者系统。发音类似“砰”，对黑客而言，这就是成功实施黑客攻击的声音——砰的一声，被“黑”的电脑或手机就被你操纵了。   pwn题要干嘛：构造或者伪造后门函数，得到shell。   看懂pwn题exp参考：pwntools使用简介https://blog">
   
   
     <link rel="icon" href="/css/images/favicon.ico">
@@ -74,15 +75,24 @@
 
       <header class="entry-header">
         
+        
+  
+    <h1 class="entry-title article-title">
+      pwn level0，1，2
+    </h1>
+  
+
+        
         <div class="comments-link">
             
-            <a href="javascript:void(0);" data-url="http://yoursite.com/2019/07/27/pwn012/" data-id="cjyl9y27x0002pgvwr61d4u6a" class="leave-reply bdsharebuttonbox" data-cmd="more">Share</a>
+            <a href="javascript:void(0);" data-url="http://yoursite.com/2019/07/25/pwn012/" data-id="cjylaebgr0004o8vwbf14yhrw" class="leave-reply bdsharebuttonbox" data-cmd="more">Share</a>
         </div><!-- .comments-link -->
       </header><!-- .entry-header -->
 
     <div class="entry-content">
       
-        <p>#pwn level0 、 level1 、 level2总结</p>
+        <a id="more"></a>
+<p>#pwn level0 、 level1 、 level2总结</p>
 <p>##pwn题初识</p>
 <p>   初识pwn：“Pwn”是一个黑客语法的俚语词，是指攻破设备或者系统。发音类似“砰”，对黑客而言，这就是成功实施黑客攻击的声音——砰的一声，被“黑”的电脑或手机就被你操纵了。</p>
 <p>  pwn题要干嘛：构造或者伪造后门函数，得到shell。</p>
@@ -121,13 +131,16 @@ p.interactive()     </code></pre><p><strong>原理就是把shellcode（即是she
     </div><!-- .entry-content -->
 
     <footer class="entry-meta">
-    <a href="/2019/07/27/pwn012/">
-    <time datetime="2019-07-27T08:21:56.995Z" class="entry-date">
-        2019-07-27
+    <a href="/2019/07/25/pwn012/">
+    <time datetime="2019-07-25T06:09:47.000Z" class="entry-date">
+        2019-07-25
     </time>
 </a>
     
     
+  <span class="article-delim">&#8226;</span>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/pwn/">pwn</a></li></ul>
+
     </footer>
 </article>
 
@@ -136,10 +149,10 @@ p.interactive()     </code></pre><p><strong>原理就是把shellcode（即是she
 <nav class="nav-single">
     <h3 class="assistive-text">文章导航</h3>
     
-        <span class="nav-previous"><a href="/2019/07/27/web张/" rel="prev"><span class="meta-nav">←</span> (no title)</a></span>
+        <span class="nav-previous"><a href="/2019/07/27/pwn3_x64_2_str/" rel="prev"><span class="meta-nav">←</span> pwn level3 level2_x64及pwn1</a></span>
     
     
-        <span class="nav-next"><a href="/2019/07/19/第一天__10种基本工具/" rel="next">第一天=·=10种基本工具 <span class="meta-nav">→</span></a></span>
+        <span class="nav-next"><a href="/2019/07/19/web张/" rel="next">第二天 ---web安全 <span class="meta-nav">→</span></a></span>
     
 </nav><!-- .nav-single -->
 
@@ -170,11 +183,15 @@ p.interactive()     </code></pre><p><strong>原理就是把shellcode（即是she
       <ul>
         
           <li>
-            <a href="/2019/07/27/web张/">(no title)</a>
+            <a href="/2019/07/27/pwn3_x64_2_str/">pwn level3 level2_x64及pwn1</a>
           </li>
         
           <li>
-            <a href="/2019/07/27/pwn012/">(no title)</a>
+            <a href="/2019/07/25/pwn012/">pwn level0，1，2</a>
+          </li>
+        
+          <li>
+            <a href="/2019/07/19/web张/">第二天 ---web安全</a>
           </li>
         
           <li>
@@ -183,10 +200,6 @@ p.interactive()     </code></pre><p><strong>原理就是把shellcode（即是she
         
           <li>
             <a href="/2019/06/12/Window命令小结及Python基本语法/">(no title)</a>
-          </li>
-        
-          <li>
-            <a href="/2019/06/10/Frist-Blood/">Frist Blood</a>
           </li>
         
       </ul>
@@ -198,7 +211,7 @@ p.interactive()     </code></pre><p><strong>原理就是把shellcode（即是she
   <aside class="widget">
     <h3 class="widget-title">Tags</h3>
     <div class="widget-content">
-      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/web/">web</a><span class="tag-list-count">1</span></li></ul>
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/pwn/">pwn</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/web/">web</a><span class="tag-list-count">2</span></li></ul>
     </div>
   </aside>
 
@@ -207,7 +220,7 @@ p.interactive()     </code></pre><p><strong>原理就是把shellcode（即是she
   <aside class="widget">
     <h3 class="widget-title">Tag Cloud</h3>
     <div class="widget-content tagcloud">
-      <a href="/tags/web/" style="font-size: 10px;">web</a>
+      <a href="/tags/pwn/" style="font-size: 10px;">pwn</a> <a href="/tags/web/" style="font-size: 10px;">web</a>
     </div>
   </aside>
 
