@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="utf-8">
+  
+  
+  <meta name="description" content="小白的第二天 ——web安全题型分类：
+php代码审计：
+
+
+   -extract变量覆盖、php弱类型比较、二次url编码绕过、哈希绕过、正则绕过
+
+
+
+文件上传、文件包含 
+
+-
+     本地js检验、黑名单检验、白名单、内容检验、竞争上传
+-
+
+序列化与反序列化
+
+-
+     魔法函数绕">
+  
+
+  
+  
+  
+  
+  
+  
+  <title>QianKeTutu</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="小白的第二天 ——web安全题型分类： php代码审计：      -extract变量覆盖、php弱类型比较、二次url编码绕过、哈希绕过、正则绕过    文件上传、文件包含   -      本地js检验、黑名单检验、白名单、内容检验、竞争上传 -  序列化与反序列化  -      魔法函数绕过 -  sql注入  -        宽字节注入、约束条件的注入、基于时间的盲注 ####自己掌">
+<meta property="og:type" content="article">
+<meta property="og:title" content="QianKeTutu">
+<meta property="og:url" content="http://yoursite.com/2019/07/27/web张/index.html">
+<meta property="og:site_name" content="QianKeTutu">
+<meta property="og:description" content="小白的第二天 ——web安全题型分类： php代码审计：      -extract变量覆盖、php弱类型比较、二次url编码绕过、哈希绕过、正则绕过    文件上传、文件包含   -      本地js检验、黑名单检验、白名单、内容检验、竞争上传 -  序列化与反序列化  -      魔法函数绕过 -  sql注入  -        宽字节注入、约束条件的注入、基于时间的盲注 ####自己掌">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2019-07-20T08:55:50.655Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="QianKeTutu">
+<meta name="twitter:description" content="小白的第二天 ——web安全题型分类： php代码审计：      -extract变量覆盖、php弱类型比较、二次url编码绕过、哈希绕过、正则绕过    文件上传、文件包含   -      本地js检验、黑名单检验、白名单、内容检验、竞争上传 -  序列化与反序列化  -      魔法函数绕过 -  sql注入  -        宽字节注入、约束条件的注入、基于时间的盲注 ####自己掌">
+  
+  
+    <link rel="icon" href="/css/images/favicon.ico">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+
+  
+  <!-- baidu webmaster push -->
+  <script src="//push.zhanzhang.baidu.com/push.js"></script>
+</head></html>
+<body class="home blog custom-background custom-font-enabled single-author">
+  <div id="page" class="hfeed site">
+      <header id="masthead" class="site-header" role="banner">
+    <hgroup>
+      <h1 class="site-title">
+        <a href="/" title="QianKeTutu" rel="home">QianKeTutu</a>
+      </h1>
+      
+        <h2 class="site-description hitokoto"></h2>
+        <script type="text/javascript" src="https://v1.hitokoto.cn/?encode=js"></script>
+      
+    </hgroup>
+
+    <nav id="site-navigation" class="main-navigation" role="navigation">
+            <button class="menu-toggle">菜单</button>
+            <a class="assistive-text" href="/#content" title="跳至内容">跳至内容</a><!--TODO-->
+            <div class="menu-main-container">
+                <ul id="menu-main" class="nav-menu">
+                
+                    <li class="menu-item menu-item-type-post_type menu-item-object-page"><a href="/">Home</a></li>
+                
+                    <li class="menu-item menu-item-type-post_type menu-item-object-page"><a href="/archives">Archives</a></li>
+                
+                </ul>
+            </div>
+    </nav>
+</header>
+
+      <div id="main" class="wrapper">
+        <div id="primary" class="site-content"><div id="content" role="main"><article id="post-web张" class="post-web张 post type-post status-publish format-standard hentry">
+    <!---->
+
+      <header class="entry-header">
+        
+        <div class="comments-link">
+            
+            <a href="javascript:void(0);" data-url="http://yoursite.com/2019/07/27/web张/" data-id="cjyl9y2830003pgvwekokyd08" class="leave-reply bdsharebuttonbox" data-cmd="more">Share</a>
+        </div><!-- .comments-link -->
+      </header><!-- .entry-header -->
+
+    <div class="entry-content">
+      
+        <h1 id="小白的第二天-——web安全"><a href="#小白的第二天-——web安全" class="headerlink" title="小白的第二天 ——web安全"></a>小白的第二天 ——web安全</h1><h2 id="题型分类："><a href="#题型分类：" class="headerlink" title="题型分类："></a>题型分类：</h2><ol>
+<li>php代码审计：</li>
+</ol>
+<ul>
+<li><p>   -extract变量覆盖、php弱类型比较、二次url编码绕过、哈希绕过、正则绕过</p>
+</li>
+</ul>
+<ol start="2">
+<li>文件上传、文件包含 </li>
+</ol>
+<p>-
+     本地js检验、黑名单检验、白名单、内容检验、竞争上传</p>
+<p>-</p>
+<ol start="3">
+<li>序列化与反序列化</li>
+</ol>
+<p>-
+     魔法函数绕过</p>
+<p>-</p>
+<ol start="4">
+<li>sql注入</li>
+</ol>
+<p>-
+       宽字节注入、约束条件的注入、基于时间的盲注</p>
+<p>####自己掌握的点：####<br>  1.文件上传：<br>-
+上传点无任何过滤，写个php文件“一句话木马”，上传这个文件，访问这个文件的地址，无报错，则上传成功，利用菜刀或者蚁剑，添加数据</p>
+<p>  2.sql注入：id是带单引号的.<br>-
+用’闭合前面的引号，用#注释掉后面的引号。<br>-
+尝试 ‘1，报错。<br>‘可用<br>试 order by<br>1.爆数据库名：? id=-1’union select 1,database(),3 # </p>
+<p>select (select group_concat(schema_name) from information_schema.schemata )</p>
+<p>2.爆数据库表名：<br>(select group_concat(table_name) from information_schema.tables where table_schema=database())</p>
+<p>3.爆表中的字段名：(select group_concat(column_name) from information_schema.columns where table_name=’users’)</p>
+<p>4.爆字段中的内容：</p>
+<p>select 1,username, password from users where id=2 </p>
+<p>-</p>
+<p>-</p>
+<ol start="3">
+<li><p>Robots协议.</p>
+<ul>
+<li>也称为爬虫协议、机器人协议等）的全称是“网络爬虫排除标准”（Robots Exclusion Protocol），网站通过Robots协议告诉搜索引擎哪些页面可以抓取，哪些页面不能抓取。<br>在网站根目录下放一个  “<strong>robots.txt</strong>”    文本文件，有时候它会声明此网站不可以被git。</li>
+</ul>
+</li>
+<li><p>修改XFF，<a href="关于XFF点击此链接">http://www.mamicode.com/info-detail-1689650.html</a> 修改Referer.</p>
+</li>
+</ol>
+<p> -</p>
+<p> 5.关于git<br>-</p>
+<p>   基于Git 的 源码获取<br>          由于现在当前大量开发人员使用git进行版本控制，对站点自动部署。  如果配置不当，可能会将.git文件夹直接部署到线上环境。<br>             这就引起了git泄露漏洞。<br>             GitHack是一个.git泄露利用脚本，通过泄露的.git文件夹下的文件，还原重建工程源代码。<br>             Git信息泄露的危害很大，渗透测试人员、攻击者，可直接从源码获取敏感配置信息（如：邮箱，数据库），也可以进一步审计代码，挖掘文件上传、SQL注射等安全漏洞。<br>命令：  python2 GitHack.py  -u <a href="http://www.hoolai.com/.git/" target="_blank" rel="noopener">http://www.hoolai.com/.git/</a></p>
+<p>6.备份文件后缀总结：<br>-
+   备份文件的文件的常见后缀<br>-
+  .rar</p>
+<p>  .zip</p>
+<p>  .7z</p>
+<p>  .tar.gz</p>
+<p>  .bak</p>
+<p>  .swp</p>
+<p>  .txt</p>
+<p>  .html</p>
+<p>linux中可能以” ~ “ 结尾</p>
+<p>-
+7.扫描<br>-
+有些网站的隐藏的文件，页面并不是能够发现，所以需要我们利用一些扫描工具进行扫描，<br>                 得到隐藏的页面，得到关键的信息。<br>                 常用的扫描软件：御剑，dirserach<br>                 御剑在window下运用，而dirsearch需要在linux下进行扫描。<br>              Dirsearch扫描命令格式：./dirsearch –u 目标网址 –e*</p>
+<pre><code>例如：./dirsearch –u htttps://www.baidu.com –e</code></pre>
+      
+    </div><!-- .entry-content -->
+
+    <footer class="entry-meta">
+    <a href="/2019/07/27/web张/">
+    <time datetime="2019-07-27T08:21:57.131Z" class="entry-date">
+        2019-07-27
+    </time>
+</a>
+    
+    
+    </footer>
+</article>
+
+
+    
+<nav class="nav-single">
+    <h3 class="assistive-text">文章导航</h3>
+    
+    
+        <span class="nav-next"><a href="/2019/07/27/pwn012/" rel="next">(no title) <span class="meta-nav">→</span></a></span>
+    
+</nav><!-- .nav-single -->
+
+
+
+
+
+
+
+</div></div>
+        <div id="secondary" class="widget-area" role="complementary">
+  
+    <aside id="search" class="widget widget_search"><form role="search" method="get" accept-charset="utf-8" id="searchform" class="searchform" action="//google.com/search">
+    <div>
+        <input type="text" value name="s" id="s">
+        <input type="submit" id="searchsubmit" value="搜索">
+    </div>
+</form></aside>
+  
+    
+  
+    
+  
+    
+  <aside class="widget">
+    <h3 class="widget-title">Recents</h3>
+    <div class="widget-content">
+      <ul>
+        
+          <li>
+            <a href="/2019/07/27/web张/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2019/07/27/pwn012/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2019/07/19/第一天__10种基本工具/">第一天=·=10种基本工具</a>
+          </li>
+        
+          <li>
+            <a href="/2019/06/12/Window命令小结及Python基本语法/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2019/06/10/Frist-Blood/">Frist Blood</a>
+          </li>
+        
+      </ul>
+    </div>
+  </aside>
+
+  
+    
+  <aside class="widget">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget-content">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/web/">web</a><span class="tag-list-count">1</span></li></ul>
+    </div>
+  </aside>
+
+  
+    
+  <aside class="widget">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget-content tagcloud">
+      <a href="/tags/web/" style="font-size: 10px;">web</a>
+    </div>
+  </aside>
+
+  
+</div>
+      </div>
+      <footer id="colophon" role="contentinfo">
+    <p>&copy; 2019 QianKeTutu
+    All rights reserved.</p>
+    <p>Powered by <a href="http://hexo.io/" target="_blank">Hexo</a></p>
+</footer>
+    <script>window._bd_share_config={"common":{"bdSnsKey":{},"bdText":"","bdMini":"1","bdMiniList":false,"bdPic":"","bdStyle":"2","bdSize":"16"},"share":{}};with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='/js/share.js'];</script>
+
+<script src="/js/jquery-3.3.1.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+<script src="/js/navigation.js"></script>
+
+<div id="bg"></div>
+
+  </div>
+</body>
+</html>

