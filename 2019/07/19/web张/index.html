@@ -2,35 +2,13 @@
 <html>
 <head><meta name="generator" content="Hexo 3.8.0">
   <meta charset="utf-8">
-  
-  
-  <meta name="description" content="小白的第二天 ——web安全题型分类：
-php代码审计：
-
-
-   -extract变量覆盖、php弱类型比较、二次url编码绕过、哈希绕过、正则绕过
-
-
-
-文件上传、文件包含 
-
--
-     本地js检验、黑名单检验、白名单、内容检验、竞争上传
--
-
-序列化与反序列化
-
--
-     魔法函数绕">
-  
-
-  
-  
-  
-  
-  
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
   
   <title>第二天 ---web安全 | QianKeTutu</title>
+  <meta name="description" content="A geeker blog.">
+  <meta name="keywords" content="hexo,theme,icer,ggice">
+  <meta name="HandheldFriendly" content="True">
+  <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
   <meta name="description" content="小白的第二天 ——web安全题型分类： php代码审计：      -extract变量覆盖、php弱类型比较、二次url编码绕过、哈希绕过、正则绕过    文件上传、文件包含   -      本地js检验、黑名单检验、白名单、内容检验、竞争上传 -  序列化与反序列化  -      魔法函数绕过 -  sql注入  -        宽字节注入、约束条件的注入、基于时间的盲注 ####自己">
 <meta name="keywords" content="web">
@@ -46,66 +24,151 @@ php代码审计：
 <meta name="twitter:description" content="小白的第二天 ——web安全题型分类： php代码审计：      -extract变量覆盖、php弱类型比较、二次url编码绕过、哈希绕过、正则绕过    文件上传、文件包含   -      本地js检验、黑名单检验、白名单、内容检验、竞争上传 -  序列化与反序列化  -      魔法函数绕过 -  sql注入  -        宽字节注入、约束条件的注入、基于时间的盲注 ####自己">
   
   
-    <link rel="icon" href="/css/images/favicon.ico">
-  
-  <link rel="stylesheet" href="/css/style.css">
+
+  <link rel="stylesheet" href="//cdn.x21.xyz/libs/nprogress/0.2.0/nprogress.css">
+  <link rel="stylesheet" href="//cdn.x21.xyz/libs/highlight/9.12.0/styles/github-gist.css">
+  <link rel="stylesheet" href="//at.alicdn.com/t/font_405585_yuudmyqpo3q.css">
+  <script src="//cdn.x21.xyz/libs/nprogress/0.2.0/nprogress.js"></script>
+  <!-- <script>try{Typekit.load({ async: false });}catch(e){}</script> -->
+  <link rel="stylesheet" href="/style.css">
   
 
   
-  <!-- baidu webmaster push -->
-  <script src="//push.zhanzhang.baidu.com/push.js"></script>
-</head></html>
-<body class="home blog custom-background custom-font-enabled single-author">
-  <div id="page" class="hfeed site">
-      <header id="masthead" class="site-header" role="banner">
-    <hgroup>
-      <h1 class="site-title">
-        <a href="/" title="QianKeTutu" rel="home">QianKeTutu</a>
-      </h1>
+
+<!-- baidu Analytics -->
+<script>
+  var _hmt = _hmt || [];
+  (function() {
+    var hm = document.createElement("script");
+    hm.src = "https://hm.baidu.com/hm.js?403460ed7637fb6c4a9e09a74e662ca0";
+    var s = document.getElementsByTagName("script")[0]; 
+    s.parentNode.insertBefore(hm, s);
+  })();
+  </script>
+  
+<!-- End baidu Analytics -->
+
+
+</head>
+</html>
+<body>
+  
+  <script>NProgress.start();</script>
+  
+  <div id="site-wrapper">
+    
+    <header class="header">
+  <div class="header-wrapper">
+    <a href="/">
+      <img src="/image/logo.jpg" class="logo">
+      <!-- <span class="site-desc">
+        
+      </span> -->
+    </a>
+    <div class="social-wrapper">
       
-        <h2 class="site-description hitokoto"></h2>
-        <script type="text/javascript" src="https://v1.hitokoto.cn/?encode=js"></script>
+        
+          <a href="https://twitter.com/iggice" class="social twitter" target="_blank" rel="external">
+            <span class="iconfont icon-twitter"></span>
+          </a>
+          
+          <a href="https://github.com/ggice" class="social github" target="_blank" rel="external">
+            <span class="iconfont icon-github"></span>
+          </a>
+          
+          <a href="http://ggice.lofter.com/" class="social lofter" target="_blank" rel="external">
+            <span class="iconfont icon-lofter"></span>
+          </a>
+          
+          <a href="https://dribbble.com/ggice" class="social dribbble" target="_blank" rel="external">
+            <span class="iconfont icon-dribbble"></span>
+          </a>
+          
+          <a href="mailto:i@ice.gs" class="social email" target="_blank" rel="external">
+            <span class="iconfont icon-email"></span>
+          </a>
+          
+          <a href="/atom.xml" class="social rss" target="_blank" rel="external">
+            <span class="iconfont icon-rss"></span>
+          </a>
+          
       
-    </hgroup>
-
-    <nav id="site-navigation" class="main-navigation" role="navigation">
-            <button class="menu-toggle">菜单</button>
-            <a class="assistive-text" href="/#content" title="跳至内容">跳至内容</a><!--TODO-->
-            <div class="menu-main-container">
-                <ul id="menu-main" class="nav-menu">
-                
-                    <li class="menu-item menu-item-type-post_type menu-item-object-page"><a href="/">Home</a></li>
-                
-                    <li class="menu-item menu-item-type-post_type menu-item-object-page"><a href="/archives">Archives</a></li>
-                
-                </ul>
-            </div>
-    </nav>
-</header>
-
-      <div id="main" class="wrapper">
-        <div id="primary" class="site-content"><div id="content" role="main"><article id="post-web张" class="post-web张 post type-post status-publish format-standard hentry">
-    <!---->
-
-      <header class="entry-header">
-        
-        
-  
-    <h1 class="entry-title article-title">
-      第二天 ---web安全
-    </h1>
-  
-
-        
-        <div class="comments-link">
+      
+      <a href="#" class="social search-do" target="_blank" rel="external">
+        <span class="iconfont icon-search"></span>
+      </a>
             
-            <a href="javascript:void(0);" data-url="http://yoursite.com/2019/07/19/web张/" data-id="cjylazb280003fcvw0jfsipj8" class="leave-reply bdsharebuttonbox" data-cmd="more">Share</a>
-        </div><!-- .comments-link -->
-      </header><!-- .entry-header -->
-
-    <div class="entry-content">
+      <!-- <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><input type="hidden" name="sitesearch" value="http://yoursite.com"></form> -->
+    </div>
+    <div class="search-wrap">
+      <div class="search-content animated fade-in">
+        <p class="search-input">
+          <span class="iconfont icon-search"></span>
+          <input tabindex="1">
+        </p>
+        <ul class="search-result">
+            
+              <div class="tags">
+                   <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/pwn/">pwn</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/web/">web</a></li></ul>
+                </div>
+            
+        </ul>
+      </div>
+    </div>
+    <nav class="header-nav">
       
-        <a id="more"></a>
+        <a href="/" class="archives">
+          home
+        </a>
+        
+        <a href="/tags/web-development/" class="archives">
+          web development
+        </a>
+        
+        <a href="/tags/soft/" class="archives">
+          soft
+        </a>
+        
+        <a href="/tags/os/" class="archives">
+          os
+        </a>
+        
+        <a href="/archives" class="archives">
+          archives
+        </a>
+        
+        <a href="/README/" class="archives">
+          README
+        </a>
+        
+    </nav>
+  </div>
+</header>
+    <script>NProgress.set(0.4);</script>
+    
+    <main id="main" role="main">
+      <article id="post-web张" class="post article white-box article-type-post animated fade-in-top" itemscope itemprop="blogPost">
+  <section class="post-header article-header">
+    <h2 class="title">
+        <a href="/2019/07/19/web张/">
+          第二天 ---web安全
+        </a>
+      </h2>
+      <div class="subtitle">
+          <time>
+            Jul 19, 2019
+          </time>
+          
+            <span class="tags">
+                <span class="iconfont icon-tag"></span>
+                <a class="tag-link" href="/tags/web/">web</a>
+              </span>
+          
+      </div>
+  </section>
+  <section class="content">
+    <div class="article-entry" itemprop="articleBody">
+      <a id="more"></a>
 <h1 id="小白的第二天-——web安全"><a href="#小白的第二天-——web安全" class="headerlink" title="小白的第二天 ——web安全"></a>小白的第二天 ——web安全</h1><h2 id="题型分类："><a href="#题型分类：" class="headerlink" title="题型分类："></a>题型分类：</h2><ol>
 <li>php代码审计：</li>
 </ol>
@@ -169,126 +232,64 @@ php代码审计：
 7.扫描<br>-
 有些网站的隐藏的文件，页面并不是能够发现，所以需要我们利用一些扫描工具进行扫描，<br>                 得到隐藏的页面，得到关键的信息。<br>                 常用的扫描软件：御剑，dirserach<br>                 御剑在window下运用，而dirsearch需要在linux下进行扫描。<br>              Dirsearch扫描命令格式：./dirsearch –u 目标网址 –e*</p>
 <pre><code>例如：./dirsearch –u htttps://www.baidu.com –e</code></pre>
-      
-    </div><!-- .entry-content -->
+    </div>
+  </section>
 
-    <footer class="entry-meta">
-    <a href="/2019/07/19/web张/">
-    <time datetime="2019-07-19T06:09:47.000Z" class="entry-date">
-        2019-07-19
-    </time>
-</a>
-    
-    
-  <span class="article-delim">&#8226;</span>
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/web/">web</a></li></ul>
-
-    </footer>
+  
+  
 </article>
-
-
+      <script>NProgress.set(0.6);</script>
+    </main>
     
-<nav class="nav-single">
-    <h3 class="assistive-text">文章导航</h3>
-    
-        <span class="nav-previous"><a href="/2019/07/25/pwn012/" rel="prev"><span class="meta-nav">←</span> pwn level0，1，2</a></span>
-    
-    
-        <span class="nav-next"><a href="/2019/07/19/第一天__10种基本工具/" rel="next">第一天=·=10种基本工具 <span class="meta-nav">→</span></a></span>
-    
-</nav><!-- .nav-single -->
-
-
-
-
-
-
-
-</div></div>
-        <div id="secondary" class="widget-area" role="complementary">
-  
-    <aside id="search" class="widget widget_search"><form role="search" method="get" accept-charset="utf-8" id="searchform" class="searchform" action="//google.com/search">
-    <div>
-        <input type="text" value name="s" id="s">
-        <input type="submit" id="searchsubmit" value="搜索">
+    <footer class="footer">
+  <div class="footer-wrap">
+    <div class="footer-link">
+      
+      <h3>LINKS</h3>
+      <p>
+        
+          <a href="http://1x0.xyz/" target="_blank">Tian1x0</a>
+        
+          <a href="http://www.royalmice.com/hankzhou/" target="_blank">Hankzhou</a>
+        
+          <a href="http://sjydh.me/" target="_blank">设计有点货</a>
+        
+          <a href="https://developers.google.com/web/fundamentals/" target="_blank">Web fundamentals</a>
+        
+      </p>
+      
     </div>
-</form></aside>
-  
-    
-  
-    
-  
-    
-  <aside class="widget">
-    <h3 class="widget-title">Recents</h3>
-    <div class="widget-content">
-      <ul>
-        
-          <li>
-            <a href="/2019/07/27/pwn3_x64_2_str/">pwn level3 level2_x64及pwn1</a>
-          </li>
-        
-          <li>
-            <a href="/2019/07/25/pwn012/">pwn level0，1，2</a>
-          </li>
-        
-          <li>
-            <a href="/2019/07/19/web张/">第二天 ---web安全</a>
-          </li>
-        
-          <li>
-            <a href="/2019/07/19/第一天__10种基本工具/">第一天=·=10种基本工具</a>
-          </li>
-        
-          <li>
-            <a href="/2019/06/12/Window命令小结及Python基本语法/">(no title)</a>
-          </li>
-        
-      </ul>
+    <div class="footer-tags">
+      
+        <h3>TAGS</h3>        
+        <div class="tags">
+             <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/pwn/">pwn</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/web/">web</a></li></ul>
+          </div>
+      
     </div>
-  </aside>
-
-  
-    
-  <aside class="widget">
-    <h3 class="widget-title">Tags</h3>
-    <div class="widget-content">
-      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/pwn/">pwn</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/web/">web</a><span class="tag-list-count">2</span></li></ul>
-    </div>
-  </aside>
-
-  
-    
-  <aside class="widget">
-    <h3 class="widget-title">Tag Cloud</h3>
-    <div class="widget-content tagcloud">
-      <a href="/tags/pwn/" style="font-size: 10px;">pwn</a> <a href="/tags/web/" style="font-size: 10px;">web</a>
-    </div>
-  </aside>
-
-  
-</div>
+    <div class="footer-info">
+        <div>Theme <span class="codename"><a href="https://github.com/GGICE/hexo-icer" target="_blank">icer</a></span> designed & coded by <a href="https://ice.gs/" target="_blank">GGICE</a></div>
+        <div>Copyright &copy; 2019, <a href="/">QianKeTutu</a>  . All rights reserved .</div>
       </div>
-      <footer id="colophon" role="contentinfo">
-    <p>&copy; 2019 QianKeTutu
-    All rights reserved.</p>
-    <p>Powered by <a href="http://hexo.io/" target="_blank">Hexo</a></p>
-</footer>
-    <script>window._bd_share_config={"common":{"bdSnsKey":{},"bdText":"","bdMini":"1","bdMiniList":false,"bdPic":"","bdStyle":"2","bdSize":"16"},"share":{}};with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='/js/share.js'];</script>
-
-<script src="/js/jquery-3.3.1.min.js"></script>
-
-
-  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
-  <script src="/fancybox/jquery.fancybox.pack.js"></script>
-
-
-<script src="/js/script.js"></script>
-
-<script src="/js/navigation.js"></script>
-
-<div id="bg"></div>
-
   </div>
+</footer>
+
+
+    <script>NProgress.set(0.8);</script>
+    
+  </div>
+
+  <script src="//cdn.x21.xyz/libs/highlight/9.12.0/highlight.pack.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+<script src="/js/main.js"></script>
+
+<!-- Commit -->
+
+
+
+  <script>
+    NProgress.done();
+  </script>
+  
 </body>
 </html>
